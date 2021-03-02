@@ -22,8 +22,8 @@
 ########################################################################
 include(GrPlatform) #define LIB_SUFFIX
 
-include_directories(${Boost_INCLUDE_DIR})
-link_directories(${Boost_LIBRARY_DIRS})
+# include_directories(${Boost_INCLUDE_DIR})
+# link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND NTSC_sources
     decoder_c_impl.cc
@@ -38,7 +38,7 @@ if(NOT NTSC_sources)
 endif(NOT NTSC_sources)
 
 add_library(gnuradio-NTSC SHARED ${NTSC_sources})
-target_link_libraries(gnuradio-NTSC ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES})
+target_link_libraries(gnuradio-NTSC gnuradio::gnuradio-runtime gnuradio::gnuradio-blocks gnuradio::gnuradio-fft gnuradio::gnuradio-filter Volk::volk)
 set_target_properties(gnuradio-NTSC PROPERTIES DEFINE_SYMBOL "gnuradio_NTSC_EXPORTS")
 
 if(APPLE)
@@ -50,18 +50,25 @@ endif(APPLE)
 ########################################################################
 # Install built library files
 ########################################################################
-install(TARGETS gnuradio-NTSC
-    LIBRARY DESTINATION lib${LIB_SUFFIX} # .so/.dylib file
-    ARCHIVE DESTINATION lib${LIB_SUFFIX} # .lib file
-    RUNTIME DESTINATION bin              # .dll file
-)
+include(GrMiscUtils)
+# set(VERSION 1)
+# set(LIBVER 1)
+GR_LIBRARY_FOO(gnuradio-NTSC)
+
+########################################################################
+# Print summary
+########################################################################
+message(STATUS "Using install prefix: ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "Building for version: ${VERSION} / ${LIBVER}")
 
 ########################################################################
 # Build and register unit test
 ########################################################################
+find_package(cppunit REQUIRED)
+
 include(GrTest)
 
-include_directories(${CPPUNIT_INCLUDE_DIRS})
+include_directories(${cppunit_INCLUDE_DIRS})
 
 list(APPEND test_NTSC_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/test_NTSC.cc
@@ -74,7 +81,7 @@ target_link_libraries(
   test-NTSC
   ${GNURADIO_RUNTIME_LIBRARIES}
   ${Boost_LIBRARIES}
-  ${CPPUNIT_LIBRARIES}
+  ${cppunit_LIBRARIES}
   gnuradio-NTSC
 )
 

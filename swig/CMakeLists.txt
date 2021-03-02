@@ -17,6 +17,8 @@
 # the Free Software Foundation, Inc., 51 Franklin Street,
 # Boston, MA 02110-1301, USA.
 
+include(GrPlatform) #define LIB_SUFFIX
+
 ########################################################################
 # Check if there is C++ code at all
 ########################################################################
@@ -29,19 +31,18 @@ endif(NOT NTSC_sources)
 # Include swig generation macros
 ########################################################################
 find_package(SWIG)
-find_package(PythonLibs 2)
+find_package(PythonLibs 3.7 REQUIRED)
 if(NOT SWIG_FOUND OR NOT PYTHONLIBS_FOUND)
     return()
 endif()
-include(GrSwig)
 include(GrPython)
+include(GrSwig)
 
 ########################################################################
 # Setup swig generation
 ########################################################################
-foreach(incdir ${GNURADIO_RUNTIME_INCLUDE_DIRS})
-    list(APPEND GR_SWIG_INCLUDE_DIRS ${incdir}/gnuradio/swig)
-endforeach(incdir)
+set(GR_SWIG_INCLUDE_DIRS $<TARGET_PROPERTY:gnuradio::runtime_swig,INTERFACE_INCLUDE_DIRECTORIES>)
+list(APPEND GR_SWIG_TARGET_DEPS gnuradio::runtime_swig)
 
 set(GR_SWIG_LIBRARIES gnuradio-NTSC)
 set(GR_SWIG_DOC_FILE ${CMAKE_CURRENT_BINARY_DIR}/NTSC_swig_doc.i)
@@ -50,7 +51,7 @@ set(GR_SWIG_DOC_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 GR_SWIG_MAKE(NTSC_swig NTSC_swig.i)
 
 ########################################################################
-# Install the build swig module
+# Install the built swig module
 ########################################################################
 GR_SWIG_INSTALL(TARGETS NTSC_swig DESTINATION ${GR_PYTHON_DIR}/NTSC)
 
