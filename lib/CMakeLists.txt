@@ -38,6 +38,7 @@ if(NOT NTSC_sources)
 endif(NOT NTSC_sources)
 
 add_library(gnuradio-NTSC SHARED ${NTSC_sources})
+target_include_directories(gnuradio-NTSC PRIVATE "${PROJECT_SOURCE_DIR}/include")
 target_link_libraries(gnuradio-NTSC gnuradio::gnuradio-runtime gnuradio::gnuradio-blocks gnuradio::gnuradio-fft gnuradio::gnuradio-filter Volk::volk)
 set_target_properties(gnuradio-NTSC PROPERTIES DEFINE_SYMBOL "gnuradio_NTSC_EXPORTS")
 
